@@ -34,12 +34,6 @@ app.get("/api/:date", (req, res) => {
   const timestamp = +dateStr;
   const dateObj = new Date(timestamp);
 
-  if (/^\d{5,}/.test(dateStr)) {
-    return res.status(200).json({
-      unix: timestamp,
-      utc: new Date(timestamp).toUTCString(),
-    });
-  }
   if (dateObj.toString() === "Invalid Date") {
     return res.status(200).json({ error: "Invalid Date" });
   } else {
