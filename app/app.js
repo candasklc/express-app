@@ -15,22 +15,33 @@ app.use((req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-  const currentTime = new Date();
   res.status(200).json({
     status: 200,
     message: "Hey! Glad to see you.",
+  });
+});
+
+app.get("/api/", (req, res) => {
+  const currentTime = new Date();
+  res.status(200).json({
     unix: Date.now(),
     utc: currentTime.toUTCString(),
   });
 });
 
 app.get("/api/:date", (req, res) => {
-  const dateInMs = Number(req.params.date);
-  const date = new Date(dateInMs).toUTCString();
-  res.status(200).json({
-    unix: dateInMs,
-    utc: `${date}`,
-  });
+  if (req.params.date) {
+    const dateInMs = Number(req.params.date);
+    const date = new Date(dateInMs).toUTCString();
+    if (date === "Invalid Date") {
+      res.status(200).json({ error: "Invalid Date" });
+    } else {
+      res.status(200).json({
+        unix: dateInMs,
+        utc: date,
+      });
+    }
+  }
 });
 
 module.exports = app;
