@@ -25,8 +25,7 @@ app.get("/api/:date", (req, res) => {
   const dateInMs = Number(req.params.date);
   const date = new Date(dateInMs).toUTCString();
   res.status(200).json({
-    message: "Hey! Glad to see you.",
-    date: `${date}`,
+    unix: `${date}`,
   });
 });
 
