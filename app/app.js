@@ -30,15 +30,16 @@ app.get("/api/", (req, res) => {
 });
 
 app.get("/api/:date", (req, res) => {
-  if (req.params.date) {
-    const dateInMs = Number(req.params.date);
-    const date = new Date(dateInMs).toUTCString();
+  const reqDate = req.params.date;
+  if (reqDate) {
+    const dateInMs = Number(reqDate);
+    const date = new Date(dateInMs);
     if (date === "Invalid Date") {
       res.status(200).json({ error: "Invalid Date" });
     } else {
       res.status(200).json({
-        unix: dateInMs,
-        utc: date,
+        unix: date.getTime(),
+        utc: date.toUTCString(),
       });
     }
   }
