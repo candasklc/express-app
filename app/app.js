@@ -15,7 +15,7 @@ app.use((req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-  res.status.json({
+  res.status(200).json({
     status: 200,
     message: "Hey! Glad to see you.",
   });
