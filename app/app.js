@@ -15,9 +15,12 @@ app.use((req, res, next) => {
 });
 
 app.get("/", (req, res) => {
+  const currentTime = new Date();
   res.status(200).json({
     status: 200,
     message: "Hey! Glad to see you.",
+    unix: Date.now(),
+    utc: currentTime.toUTCString(),
   });
 });
 
