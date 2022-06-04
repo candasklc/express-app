@@ -24,7 +24,6 @@ app.get("/", (req, res) => {
 app.get("/api/:date", (req, res) => {
   const dateInMs = Number(req.params.date);
   const date = new Date(dateInMs).toUTCString();
-  console.log(date);
   res.status(200).json({
     message: "Hey! Glad to see you.",
     date: `${date}`,
