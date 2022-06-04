@@ -21,7 +21,7 @@ app.get("/", (req, res) => {
   });
 });
 
-app.get("/api/", (req, res) => {
+app.get("/timestamp/api/", (req, res) => {
   const currentTime = new Date();
   return res.status(200).json({
     unix: Date.now(),
@@ -29,7 +29,7 @@ app.get("/api/", (req, res) => {
   });
 });
 
-app.get("/api/:date", (req, res) => {
+app.get("/timestamp/api/:date", (req, res) => {
   let dateString = req.params.date;
 
   if (!isNaN(Date.parse(dateString))) {
@@ -60,6 +60,14 @@ app.get("/api/:date", (req, res) => {
   //     utc: dateObj.toUTCString(),
   //   });
   // }
+});
+
+app.get("/header-parser/api/whoami", (req, res) => {
+  return res.status(200).json({
+    ipaddress: req.ip,
+    language: "ENG",
+    software: "javaScript",
+  });
 });
 
 module.exports = app;
