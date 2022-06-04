@@ -23,25 +23,30 @@ app.get("/", (req, res) => {
 
 app.get("/api/", (req, res) => {
   const currentTime = new Date();
-  res.status(200).json({
+  return res.status(200).json({
     unix: Date.now(),
     utc: currentTime.toUTCString(),
   });
 });
 
 app.get("/api/:date", (req, res) => {
-  const reqDate = req.params.date;
-  if (reqDate) {
-    const dateInMs = Number(reqDate);
-    const date = new Date(dateInMs);
-    if (date === "Invalid Date") {
-      res.status(200).json({ error: "Invalid Date" });
-    } else {
-      res.status(200).json({
-        unix: date.getTime(),
-        utc: date.toUTCString(),
-      });
-    }
+  const dateStr = req.params.date;
+  const timestamp = +dateStr;
+  const dateObj = new Date(timestamp);
+
+  if (/^\d{5,}/.test(dateStr)) {
+    return res.status(200).json({
+      unix: timestamp,
+      utc: new Date(timestamp),
+    });
+  }
+  if (dateObj.toString() === "Invalid Date") {
+    return res.status(200).json({ error: "Invalid Date" });
+  } else {
+    return res.status(200).json({
+      unix: dateObj.getTime(),
+      utc: dateObj.toUTCString(),
+    });
   }
 });
 
