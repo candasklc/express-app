@@ -30,18 +30,36 @@ app.get("/api/", (req, res) => {
 });
 
 app.get("/api/:date", (req, res) => {
-  const dateStr = req.params.date;
-  const timestamp = +dateStr;
-  const dateObj = new Date(timestamp);
+  let dateString = req.params.date;
 
-  if (dateObj.toString() === "Invalid Date") {
-    return res.status(200).json({ error: "Invalid Date" });
+  if (!isNaN(Date.parse(dateString))) {
+    let dateObject = new Date(dateString);
+    res.json({ unix: dateObject.valueOf(), utc: dateObject.toUTCString() });
+  } else if (/\d{5,}/.test(dateString)) {
+    let dateInt = parseInt(dateString);
+    res.json({ unix: dateInt, utc: new Date(dateInt).toUTCString() });
   } else {
-    return res.status(200).json({
-      unix: dateObj.getTime(),
-      utc: dateObj.toUTCString(),
-    });
+    res.json({ error: "Invalid Date" });
   }
+
+  // const dateStr = req.params.date;
+  // const timestamp = +dateStr;
+  // const dateObj = new Date(timestamp);
+
+  // if (/^\d{5,}/.test(dateStr)) {
+  //   return res.status(200).json({
+  //     unix: timestamp,
+  //     utc: new Date(timestamp).toUTCString(),
+  //   });
+  // }
+  // if (dateObj.toString() === "Invalid Date") {
+  //   return res.status(200).json({ error: "Invalid Date" });
+  // } else {
+  //   return res.status(200).json({
+  //     unix: dateObj.getTime(),
+  //     utc: dateObj.toUTCString(),
+  //   });
+  // }
 });
 
 module.exports = app;
