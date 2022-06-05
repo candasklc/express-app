@@ -1,4 +1,6 @@
 const express = require("express");
+const url = require("url");
+const dns = require("node:dns");
 
 const app = express();
 
@@ -10,7 +12,7 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept"
   );
-  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   next();
 });
 
@@ -70,4 +72,27 @@ app.get("/header-parser/api/whoami", (req, res) => {
   });
 });
 
+app.get("/api/shorturl/:url", (req, res) => {
+  const theUrl = req.params.url;
+  if (theUrl.startsWith("http")) {
+    res.redirect(theUrl);
+  } else {
+    const newUrl = "http://" + theUrl;
+    res.redirect(newUrl);
+  }
+});
+
+app.post("/api/shorturl", (req, res) => {
+  const theUrl = req.body.url;
+  if (theUrl.startsWith("http://")) {
+    return res.status(200).json({
+      original_url: theUrl,
+      short_url: "1",
+    });
+  } else {
+    return res.status(200).json({
+      error: "invalid url",
+    });
+  }
+});
 module.exports = app;
