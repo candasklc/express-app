@@ -1,6 +1,6 @@
 const express = require("express");
-const url = require("url");
-const dns = require("node:dns");
+const dns = require("dns");
+const url = require("url").URL;
 
 const app = express();
 
@@ -72,27 +72,45 @@ app.get("/header-parser/api/whoami", (req, res) => {
   });
 });
 
-app.get("/api/shorturl/:url", (req, res) => {
-  const theUrl = req.params.url;
-  if (theUrl.startsWith("http")) {
-    res.redirect(theUrl);
-  } else {
-    const newUrl = "http://" + theUrl;
-    res.redirect(newUrl);
-  }
-});
+// app.get("/api/shorturl/:url", (req, res) => {
+//   const theUrl = req.params.url;
+//   try {
+//     const urlObject = new URL(theUrl);
+//     dns.lookup(urlObject.hostname, (err, address, family) => {
+//       if (err) {
+//         return res.status(200).json({
+//           error: "invalid url",
+//         });
+//       } else {
+//         res.status(200).json({
+//           url: urlObject.hostname,
+//         });
+//       }
+//     });
+//   } catch (err) {
+//     res.status(200).json({
+//       url: "invalid url",
+//     });
+//   }
+// });
 
 app.post("/api/shorturl", (req, res) => {
   const theUrl = req.body.url;
-  if (theUrl.startsWith("http://")) {
-    return res.status(200).json({
-      original_url: theUrl,
-      short_url: "1",
-    });
-  } else {
-    return res.status(200).json({
-      error: "invalid url",
-    });
-  }
+  const urlObject = new URL(theUrl);
+
+  dns.lookup(urlObject.hostname, (err, address, family) => {
+    if (err) {
+      return res.status(200).json({
+        error: "invalid url",
+      });
+    } else {
+      const shortenedURL = Math.floor(Math.random() * 100000).toString();
+      return res.status(200).json({
+        original_url: theUrl,
+        short_url: shortenedURL,
+      });
+    }
+  });
 });
+
 module.exports = app;
