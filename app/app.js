@@ -5,7 +5,7 @@ const dns = require("dns");
 const url = require("url").URL;
 
 const multer = require("multer");
-const upload = multer({ dest: "../public/storage" });
+const upload = multer();
 
 const app = express();
 
