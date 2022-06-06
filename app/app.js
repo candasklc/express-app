@@ -123,7 +123,11 @@ app.post("/api/fileanalyse", upload.single("upfile"), (req, res, next) => {
     error.httpStatusCode = 400;
     return next(error);
   }
-  return res.status(200).json(file);
+  return res.status(200).json({
+    name: file.originalname,
+    type: file.mimetype,
+    size: file.size,
+  });
 });
 
 module.exports = app;
