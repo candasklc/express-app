@@ -56,7 +56,8 @@ app.get("/header-parser/api/whoami", (req, res) => {
 });
 
 app.post("/api/shorturl", (req, res) => {
-  const theUrl = req.body.url;
+  const theUrl = req;
+  console.log(req);
   const shortenedURL = Math.floor(Math.random() * 100000).toString();
   return res.status(200).json({
     original_url: theUrl,
