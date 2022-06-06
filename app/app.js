@@ -9,6 +9,8 @@ const upload = multer();
 
 const app = express();
 
+const urlObjects = [];
+
 // for parsing application/json
 app.use(bodyParser.json());
 
@@ -87,12 +89,25 @@ app.post("/api/shorturl", (req, res) => {
       });
     } else {
       const shortenedURL = Math.floor(Math.random() * 100000).toString();
-      return res.status(200).json({
+      const objectOfUrl = {
         original_url: theUrl,
         short_url: shortenedURL,
-      });
+      };
+      urlObjects.push(objectOfUrl);
+      return res.status(200).json(objectOfUrl);
     }
   });
+});
+
+app.get("/api/shorturl/:url", (req, res) => {
+  const theShortUrl = req.params.url;
+  const isObjectExists = urlObjects.some((data) => {
+    return data.short_url === theShortUrl;
+  });
+  if (isObjectExists) {
+    const existingObj = urlObjects.find((x) => x.short_url === theShortUrl);
+    return res.redirect(existingObj.original_url);
+  }
 });
 
 module.exports = app;
