@@ -5,7 +5,7 @@ const dns = require("dns");
 const url = require("url").URL;
 
 const multer = require("multer");
-const upload = multer();
+const upload = multer({ dest: "../public/storage" });
 
 const app = express();
 
@@ -17,9 +17,9 @@ app.use(bodyParser.json());
 // for parsing application/xwww-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// for parsing multipart/form-data
-app.use(upload.array());
-app.use(express.static("../views/short-url"));
+// Static files
+app.use(express.static("../public/short-url"));
+app.use(express.static("../public/file-upload"));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -38,7 +38,7 @@ app.get("/", (req, res) => {
   });
 });
 
-// ----------------------------------------------------------------------
+// ------------------------------- Timestamp ---------------------------------------
 
 app.get("/timestamp/api/", (req, res) => {
   const currentTime = new Date();
@@ -62,7 +62,7 @@ app.get("/timestamp/api/:date", (req, res) => {
   }
 });
 
-// ----------------------------------------------------------------------
+// ------------------------------- Whoami ---------------------------------------
 
 app.get("/header-parser/api/whoami", (req, res) => {
   return res.status(200).json({
@@ -72,10 +72,10 @@ app.get("/header-parser/api/whoami", (req, res) => {
   });
 });
 
-// ----------------------------------------------------------------------
+// ------------------------------- Short Url ---------------------------------------
 
 app.get("/api/shorturl", (req, res) => {
-  return res.sendFile(path.join(__dirname, "../views/short-url/index.html"));
+  return res.sendFile(path.join(__dirname, "../public/short-url/index.html"));
 });
 
 app.post("/api/shorturl", (req, res) => {
@@ -108,6 +108,22 @@ app.get("/api/shorturl/:url", (req, res) => {
     const existingObj = urlObjects.find((x) => x.short_url === theShortUrl);
     return res.redirect(existingObj.original_url);
   }
+});
+
+// ------------------------------- File Upload ---------------------------------------
+
+app.get("/api/fileanalyse", (req, res) => {
+  return res.sendFile(path.join(__dirname, "../public/file-upload/index.html"));
+});
+
+app.post("/api/fileanalyse", upload.single("upfile"), (req, res, next) => {
+  const file = req.file;
+  if (!file) {
+    const error = new Error("Please upload a file");
+    error.httpStatusCode = 400;
+    return next(error);
+  }
+  return res.status(200).json(file);
 });
 
 module.exports = app;
