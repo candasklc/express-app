@@ -1,12 +1,23 @@
 const express = require("express");
+const bodyParser = require("body-parser");
+const path = require("path");
 const dns = require("dns");
 const url = require("url").URL;
 
+const multer = require("multer");
+const upload = multer();
+
 const app = express();
 
-let arrayObjects = [];
+// for parsing application/json
+app.use(bodyParser.json());
 
-app.use(express.json()); // for parsing the request body.
+// for parsing application/xwww-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// for parsing multipart/form-data
+app.use(upload.array());
+app.use(express.static("../views/short-url"));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -24,6 +35,8 @@ app.get("/", (req, res) => {
     message: "Hey! Glad to see you.",
   });
 });
+
+// ----------------------------------------------------------------------
 
 app.get("/timestamp/api/", (req, res) => {
   const currentTime = new Date();
@@ -47,6 +60,8 @@ app.get("/timestamp/api/:date", (req, res) => {
   }
 });
 
+// ----------------------------------------------------------------------
+
 app.get("/header-parser/api/whoami", (req, res) => {
   return res.status(200).json({
     ipaddress: req.ip,
@@ -55,28 +70,29 @@ app.get("/header-parser/api/whoami", (req, res) => {
   });
 });
 
-app.post("/api/shorturl", (req, res) => {
-  const theUrl = req;
-  console.log(req);
-  const shortenedURL = Math.floor(Math.random() * 100000).toString();
-  return res.status(200).json({
-    original_url: theUrl,
-    short_url: shortenedURL,
-  });
+// ----------------------------------------------------------------------
 
-  // dns.lookup(urlObject.hostname, (err, address, family) => {
-  //   if (err) {
-  //     return res.status(200).json({
-  //       error: "invalid url",
-  //     });
-  //   } else {
-  //     const shortenedURL = Math.floor(Math.random() * 100000).toString();
-  //     return res.status(200).json({
-  //       original_url: theUrl,
-  //       short_url: shortenedURL,
-  //     });
-  //   }
-  // });
+app.get("/api/shorturl", (req, res) => {
+  return res.sendFile(path.join(__dirname, "../views/short-url/index.html"));
+});
+
+app.post("/api/shorturl", (req, res) => {
+  const theUrl = req.body.url;
+  const urlObject = new URL(theUrl);
+
+  dns.lookup(urlObject.hostname, (err, address, family) => {
+    if (err) {
+      return res.status(200).json({
+        error: "invalid url",
+      });
+    } else {
+      const shortenedURL = Math.floor(Math.random() * 100000).toString();
+      return res.status(200).json({
+        original_url: theUrl,
+        short_url: shortenedURL,
+      });
+    }
+  });
 });
 
 module.exports = app;
