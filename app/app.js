@@ -4,6 +4,8 @@ const url = require("url").URL;
 
 const app = express();
 
+let arrayObjects = [];
+
 app.use(express.json()); // for parsing the request body.
 
 app.use((req, res, next) => {
@@ -43,25 +45,6 @@ app.get("/timestamp/api/:date", (req, res) => {
   } else {
     res.json({ error: "Invalid Date" });
   }
-
-  // const dateStr = req.params.date;
-  // const timestamp = +dateStr;
-  // const dateObj = new Date(timestamp);
-
-  // if (/^\d{5,}/.test(dateStr)) {
-  //   return res.status(200).json({
-  //     unix: timestamp,
-  //     utc: new Date(timestamp).toUTCString(),
-  //   });
-  // }
-  // if (dateObj.toString() === "Invalid Date") {
-  //   return res.status(200).json({ error: "Invalid Date" });
-  // } else {
-  //   return res.status(200).json({
-  //     unix: dateObj.getTime(),
-  //     utc: dateObj.toUTCString(),
-  //   });
-  // }
 });
 
 app.get("/header-parser/api/whoami", (req, res) => {
@@ -72,45 +55,27 @@ app.get("/header-parser/api/whoami", (req, res) => {
   });
 });
 
-// app.get("/api/shorturl/:url", (req, res) => {
-//   const theUrl = req.params.url;
-//   try {
-//     const urlObject = new URL(theUrl);
-//     dns.lookup(urlObject.hostname, (err, address, family) => {
-//       if (err) {
-//         return res.status(200).json({
-//           error: "invalid url",
-//         });
-//       } else {
-//         res.status(200).json({
-//           url: urlObject.hostname,
-//         });
-//       }
-//     });
-//   } catch (err) {
-//     res.status(200).json({
-//       url: "invalid url",
-//     });
-//   }
-// });
-
 app.post("/api/shorturl", (req, res) => {
   const theUrl = req.body.url;
-  const urlObject = new URL(theUrl);
-
-  dns.lookup(urlObject.hostname, (err, address, family) => {
-    if (err) {
-      return res.status(200).json({
-        error: "invalid url",
-      });
-    } else {
-      const shortenedURL = Math.floor(Math.random() * 100000).toString();
-      return res.status(200).json({
-        original_url: theUrl,
-        short_url: shortenedURL,
-      });
-    }
+  const shortenedURL = Math.floor(Math.random() * 100000).toString();
+  return res.status(200).json({
+    original_url: theUrl,
+    short_url: shortenedURL,
   });
+
+  // dns.lookup(urlObject.hostname, (err, address, family) => {
+  //   if (err) {
+  //     return res.status(200).json({
+  //       error: "invalid url",
+  //     });
+  //   } else {
+  //     const shortenedURL = Math.floor(Math.random() * 100000).toString();
+  //     return res.status(200).json({
+  //       original_url: theUrl,
+  //       short_url: shortenedURL,
+  //     });
+  //   }
+  // });
 });
 
 module.exports = app;
