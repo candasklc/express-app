@@ -117,16 +117,10 @@ app.get("/api/fileanalyse", (req, res) => {
 });
 
 app.post("/api/fileanalyse", upload.single("upfile"), (req, res, next) => {
-  const file = req.file;
-  if (!file) {
-    const error = new Error("Please upload a file");
-    error.httpStatusCode = 400;
-    return next(error);
-  }
-  return res.status(200).json({
-    name: file.originalname,
-    type: file.mimetype,
-    size: file.size,
+  res.json({
+    name: req.file.originalname,
+    type: req.file.mimetype,
+    size: req.file.size,
   });
 });
 
