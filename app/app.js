@@ -149,7 +149,7 @@ app.post("/api/users", (req, res) => {
     username: userName,
     _id: id,
     count: 0,
-    logs: [],
+    log: [],
   };
   userList.push(user);
   return res.json({
@@ -184,15 +184,21 @@ app.post("/api/users/:userId/exercises", (req, res, next) => {
       duration: duration,
       date: date,
     };
-    theUser.logs.push(newExercise);
+    theUser.log.push(newExercise);
     theUser = {
       _id: theUser._id,
       username: theUser.username,
-      count: theUser.logs.length,
-      logs: theUser.logs,
+      count: theUser.log.length,
+      log: theUser.log,
     };
     userList.push(theUser);
-    return res.json(theUser);
+    return res.json({
+      _id: theUser._id,
+      username: theUser.username,
+      description: description,
+      duration: duration,
+      date: date,
+    });
   } else {
     return res.json({
       message: `User does not exist. the given id: ${givenUserId}`,
@@ -207,7 +213,7 @@ app.get("/api/users/:userId/logs", (req, res) => {
     const theUser = userList.find((x) => {
       return x._id === givenUserId;
     });
-    theUser.count = theUser.logs.length;
+    theUser.count = theUser.log.length;
     return res.json(theUser);
   } else {
     return res.json({
