@@ -176,7 +176,7 @@ app.post("/api/users/:userId/exercises", (req, res, next) => {
     } else {
       date = new Date(date).toDateString();
     }
-    const duration = req.body.duration;
+    const duration = new Number(req.body.duration);
     const description = req.body.description;
 
     const newExercise = {
@@ -195,9 +195,9 @@ app.post("/api/users/:userId/exercises", (req, res, next) => {
     return res.json({
       _id: theUser._id,
       username: theUser.username,
-      description: description,
-      duration: duration,
       date: date,
+      duration: duration,
+      description: description,
     });
   } else {
     return res.json({
