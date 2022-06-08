@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const dns = require("dns");
 const url = require("url").URL;
+const { v4: uuidv4 } = require("uuid");
 
 const multer = require("multer");
 const upload = multer();
@@ -10,6 +11,8 @@ const upload = multer();
 const app = express();
 
 const urlObjects = [];
+
+const userList = [];
 
 // for parsing application/json
 app.use(bodyParser.json());
@@ -20,6 +23,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Static files
 app.use(express.static("../public/short-url"));
 app.use(express.static("../public/file-upload"));
+app.use(express.static("../public/exercise-tracker"));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -129,5 +133,89 @@ app.post("/api/fileanalyse", upload.single("upfile"), (req, res, next) => {
     size: file.size,
   });
 });
+
+// ------------------------------- Exercise tracker ---------------------------------------
+
+app.get("/exercise-tracker", (req, res) => {
+  return res.sendFile(
+    path.join(__dirname, "../public/exercise-tracker/index.html")
+  );
+});
+
+app.post("/api/users", (req, res) => {
+  const userName = req.body.username;
+  const id = uuidv4();
+  const user = {
+    username: userName,
+    _id: id,
+    count: 0,
+    logs: [],
+  };
+  userList.push(user);
+  return res.json({
+    username: userName,
+    _id: id,
+  });
+});
+
+app.get("/api/users", (req, res) => {
+  return res.json(userList);
+});
+
+app.post("/api/users/:userId/exercises", (req, res, next) => {
+  const givenUserId = req.params.userId;
+  const isExistingUser = userList.some((x) => x._id === givenUserId);
+  if (isExistingUser) {
+    let theUser = userList.find((x) => {
+      return x._id === givenUserId;
+    });
+
+    let date = req.body.date;
+    if (!date) {
+      date = new Date().toDateString();
+    } else {
+      date = new Date(date).toDateString();
+    }
+    const duration = req.body.duration;
+    const description = req.body.description;
+
+    const newExercise = {
+      description: description,
+      duration: duration,
+      date: date,
+    };
+    theUser.logs.push(newExercise);
+    theUser = {
+      _id: theUser._id,
+      username: theUser.username,
+      count: theUser.logs.length,
+      logs: theUser.logs,
+    };
+    userList.push(theUser);
+    return res.json(theUser);
+  } else {
+    return res.json({
+      message: `User does not exist. the given id: ${givenUserId}`,
+    });
+  }
+});
+
+app.get("/api/users/:userId/logs", (req, res) => {
+  const givenUserId = req.params.userId;
+  const isExistingUser = userList.some((x) => x._id === givenUserId);
+  if (isExistingUser) {
+    const theUser = userList.find((x) => {
+      return x._id === givenUserId;
+    });
+    theUser.count = theUser.logs.length;
+    return res.json(theUser);
+  } else {
+    return res.json({
+      message: `User does not exist. the given id: ${givenUserId}`,
+    });
+  }
+});
+
+// ------------------------------- End ---------------------------------------
 
 module.exports = app;
