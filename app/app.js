@@ -207,12 +207,27 @@ app.post("/api/users/:userId/exercises", (req, res, next) => {
 });
 
 app.get("/api/users/:userId/logs", (req, res) => {
+  const { from, to, limit } = req.query;
   const givenUserId = req.params.userId;
   const isExistingUser = userList.some((x) => x._id === givenUserId);
   if (isExistingUser) {
     const theUser = userList.find((x) => {
       return x._id === givenUserId;
     });
+
+    if (from) {
+      const fromDate = new Date(from);
+      theUser.log.filter((x) => new Date(x.date) > fromDate);
+    }
+
+    if (to) {
+      const toDate = new Date(to);
+      theUser.log.filter((x) => new Date(x.date) < toDate);
+    }
+
+    if (limit) {
+      theUser.log.slice(0, limit);
+    }
     theUser.count = theUser.log.length;
     return res.json(theUser);
   } else {
