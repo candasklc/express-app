@@ -214,6 +214,8 @@ app.get("/api/users/:userId/logs", (req, res) => {
       return x._id === givenUserId;
     });
 
+    let copyLog = [...theUser.log];
+
     if (req.query.from) {
       console.log(req.query.from);
       const fromDate = new Date(req.query.from);
@@ -227,10 +229,17 @@ app.get("/api/users/:userId/logs", (req, res) => {
     }
 
     if (req.query.limit) {
-      theUser.log = theUser.log.slice(0, req.query.limit);
+      copyLog = copyLog.slice(0, req.query.limit);
+    } else {
+      copyLog = [...theUser.log];
     }
-    theUser.count = theUser.log.length;
-    return res.json(theUser);
+
+    return res.json({
+      username: theUser.username,
+      _id: theUser._id,
+      count: copyLog.log.length,
+      log: copyLog,
+    });
   } else {
     return res.json({
       message: `User does not exist. the given id: ${givenUserId}`,
