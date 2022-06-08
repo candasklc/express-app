@@ -237,7 +237,7 @@ app.get("/api/users/:userId/logs", (req, res) => {
     return res.json({
       username: theUser.username,
       _id: theUser._id,
-      count: copyLog.log.length,
+      count: copyLog.length,
       log: copyLog,
     });
   } else {
