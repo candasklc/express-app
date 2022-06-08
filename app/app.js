@@ -207,7 +207,6 @@ app.post("/api/users/:userId/exercises", (req, res, next) => {
 });
 
 app.get("/api/users/:userId/logs", (req, res) => {
-  const { from, to, limit } = req.query;
   const givenUserId = req.params.userId;
   const isExistingUser = userList.some((x) => x._id === givenUserId);
   if (isExistingUser) {
@@ -215,18 +214,20 @@ app.get("/api/users/:userId/logs", (req, res) => {
       return x._id === givenUserId;
     });
 
-    if (from) {
-      const fromDate = new Date(from);
-      theUser.log.filter((x) => new Date(x.date) > fromDate);
+    if (req.query.from) {
+      console.log(req.query.from);
+      const fromDate = new Date(req.query.from);
+      theUser.log = theUser.log.filter((x) => new Date(x.date) > fromDate);
     }
 
-    if (to) {
-      const toDate = new Date(to);
-      theUser.log.filter((x) => new Date(x.date) < toDate);
+    if (req.query.to) {
+      console.log(req.query.to);
+      const toDate = new Date(req.query.to);
+      theUser.log = theUser.log.filter((x) => new Date(x.date) < toDate);
     }
 
-    if (limit) {
-      theUser.log.slice(0, limit);
+    if (req.query.limit) {
+      theUser.log = theUser.log.slice(0, req.query.limit);
     }
     theUser.count = theUser.log.length;
     return res.json(theUser);
